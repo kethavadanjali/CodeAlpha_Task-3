@@ -1,0 +1,39 @@
+# move_jpgs.py
+import os
+import shutil
+
+# ----- CONFIG -----
+SOURCE_DIR = r'C:\path\to\your\source'   # change this
+TARGET_DIR = r'C:\path\to\your\target'   # change this
+# ------------------
+
+def ensure_dir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+def is_jpg(filename):
+    return filename.lower().endswith(('.jpg', '.jpeg'))
+
+def move_jpgs(src, dst):
+    ensure_dir(dst)
+    moved = 0
+    for name in os.listdir(src):
+        full = os.path.join(src, name)
+        if os.path.isfile(full) and is_jpg(name):
+            dest = os.path.join(dst, name)
+            # handle name collision by renaming
+            base, ext = os.path.splitext(name)
+            i = 1
+            while os.path.exists(dest):
+                dest = os.path.join(dst, f"{base}_{i}{ext}")
+                i += 1
+            shutil.move(full, dest)
+            moved += 1
+            print(f"Moved: {name} -> {dest}")
+    print(f"Done. Total moved: {moved}")
+
+if __name__ == "__main__":
+    if not os.path.isdir(SOURCE_DIR):
+        print(f"Source directory does not exist: {SOURCE_DIR}")
+    else:
+        move_jpgs(SOURCE_DIR, TARGET_DIR)
